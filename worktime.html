@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>教师薪资系统 - 工时录入</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: "Microsoft YaHei", sans-serif;
+            background-color: #f5f7fa;
+            min-height: 100vh;
+        }
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+        .sidebar {
+            width: 220px;
+            background-color: #304156;
+            color: white;
+            height: 100vh;
+            position: fixed;
+        }
+        .logo {
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 1px solid #1f2d3d;
+        }
+        .logo h2 {
+            color: #409EFF;
+            font-size: 18px;
+        }
+        .menu {
+            padding: 20px 0;
+        }
+        .menu-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .menu-item:hover, .menu-item.active {
+            background-color: #263445;
+        }
+        .menu-item a {
+            color: #bfcbd9;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .menu-item.active a {
+            color: #409EFF;
+        }
+        .main-content {
+            flex: 1;
+            margin-left: 220px;
+            padding: 20px;
+        }
+        .header {
+            height: 60px;
+            background-color: white;
+            box-shadow: 0 1px 4px rgba(0, 21, 41, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            margin-bottom: 20px;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: #409EFF;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+        }
+        .card {
+            background-color: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            padding: 20px;
+        }
+        .card-title {
+            font-size: 16px;
+            color: #303133;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ebeef5;
+            padding-bottom: 10px;
+        }
+        .form-container {
+            display: flex;
+        }
+        .calendar-container {
+            width: 300px;
+            margin-right: 20px;
+        }
+        .calendar {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .calendar th {
+            padding: 10px;
+            text-align: center;
+            color: #606266;
+        }
+        .calendar td {
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            color: #606266;
+        }
+        .calendar td:hover {
+            background-color: #f5f7fa;
+        }
+        .calendar td.selected {
+            background-color: #409EFF;
+            color: white;
+        }
+        .calendar td.today {
+            color: #409EFF;
+            font-weight: bold;
+        }
+        .calendar td.has-record {
+            position: relative;
+        }
+        .calendar td.has-record::after {
+            content: '';
+            position: absolute;
+            bottom: 2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background-color: #67c23a;
+        }
+        .form-content {
+            flex: 1;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #606266;
+        }
+        .form-control {
+            width: 100%;
+            height: 40px;
+            padding: 0 15px;
+            border: 1px solid #dcdfe6;
+            border-radius: 4px;
+            color: #606266;
+            transition: border-color 0.2s;
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: #409EFF;
+        }
+        textarea.form-control {
+            height: 80px;
+            padding: 10px 15px;
+            resize: vertical;
+        }
+        .btn {
+            height: 40px;
+            padding: 0 20px;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .btn-primary {
+            background-color: #409EFF;
+        }
+        .btn-primary:hover {
+            background-color: #66b1ff;
+        }
+        .result-container {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f0f9eb;
+            border-radius: 4px;
+            border: 1px solid #e1f3d8;
+        }
+        .result-title {
+            font-size: 14px;
+            color: #67c23a;
+            margin-bottom: 10px;
+        }
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        .result-label {
+            color: #606266;
+            font-size: 14px;
+        }
+        .result-value {
+            color: #303133;
+            font-size: 14px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="logo">
+                <h2>教师薪资系统</h2>
+            </div>
+            <div class="menu">
+                <div class="menu-item">
+                    <a href="dashboard.html">仪表盘</a>
+                </div>
+                <div class="menu-item active">
+                    <a href="worktime.html">工时录入</a>
+                </div>
+                <div class="menu-item">
+                    <a href="history.html">历史收入</a>
+                </div>
+                <div class="menu-item">
+                    <a href="payslip.html">工资条</a>
+                </div>
+                <div class="menu-item">
+                    <a href="login.html">退出登录</a>
+                </div>
+            </div>
+        </div>
+        <div class="main-content">
+            <div class="header">
+                <h2>工时录入</h2>
+                <div class="user-info">
+                    <div class="user-avatar">张</div>
+                    <span>张老师</span>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-title">选择日期并录入工时</div>
+                <div class="form-container">
+                    <div class="calendar-container">
+                        <table class="calendar">
+                            <thead>
+                                <tr>
+                                    <th colspan="7">2023年11月</th>
+                                </tr>
+                                <tr>
+                                    <th>日</th>
+                                    <th>一</th>
+                                    <th>二</th>
+                                    <th>三</th>
+                                    <th>四</th>
+                                    <th>五</th>
+                                    <th>六</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td>1</td>
+                                    <td>2</td>
+                                    <td>3</td>
+                                    <td>4</td>
+                                </tr>
+                                <tr>
+                                    <td>5</td>
+                                    <td>6</td>
+                                    <td>7</td>
+                                    <td>8</td>
+                                    <td>9</td>
+                                    <td>10</td>
+                                    <td>11</td>
+                                </tr>
+                                <tr>
+                                    <td>12</td>
+                                    <td>13</td>
+                                    <td>14</td>
+                                    <td class="has-record">15</td>
+                                    <td class="selected today">16</td>
+                                    <td>17</td>
+                                    <td>18</td>
+                                </tr>
+                                <tr>
+                                    <td>19</td>
+                                    <td>20</td>
+                                    <td>21</td>
+                                    <td>22</td>
+                                    <td>23</td>
+                                    <td>24</td>
+                                    <td>25</td>
+                                </tr>
+                                <tr>
+                                    <td>26</td>
+                                    <td>27</td>
+                                    <td>28</td>
+                                    <td>29</td>
+                                    <td>30</td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div style="margin-top: 10px; font-size: 12px; color: #909399;">
+                            <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                                <div style="width: 8px; height: 8px; border-radius: 50%; background-color: #409EFF; margin-right: 5px;"></div>
+                                <span>当前选择</span>
+                            </div>
+                            <div style="display: flex; align-items: center;">
+                                <div style="width: 8px; height: 8px; border-radius: 50%; background-color: #67c23a; margin-right: 5px;"></div>
+                                <span>已有记录</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-content">
+                        <div class="form-group">
+                            <label for="date">选择日期</label>
+                            <input type="date" id="date" class="form-control" value="2023-11-16">
+                        </div>
+                        <div class="form-group">
+                            <label for="course-type">课程类型</label>
+                            <select id="course-type" class="form-control">
+                                <option value="">请选择课程类型</option>
+                                <option value="高中数学" selected>高中数学</option>
+                                <option value="高中物理">高中物理</option>
+                                <option value="高中化学">高中化学</option>
+                                <option value="初中数学">初中数学</option>
+                                <option value="初中英语">初中英语</option>
+                                <option value="初中语文">初中语文</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="hours">工时（小时）</label>
+                            <input type="number" id="hours" class="form-control" value="4.5" step="0.5" min="0.5" max="12">
+                        </div>
+                        <div class="form-group">
+                            <label for="students">学生人数</label>
+                            <input type="number" id="students" class="form-control" value="5" min="1" max="20">
+                        </div>
+                        <div class="form-group">
+                            <label for="remark">备注</label>
+                            <textarea id="remark" class="form-control" placeholder="可选填写备注信息"></textarea>
+                        </div>
+                        <button class="btn btn-primary">提交工时</button>
+                        
+                        <div class="result-container">
+                            <div class="result-title">收入计算结果</div>
+                            <div class="result-item">
+                                <span class="result-label">课时费率：</span>
+                                <span class="result-value">¥300/小时</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">基础课时费：</span>
+                                <span class="result-value">¥1,350</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">学生人数加成：</span>
+                                <span class="result-value">¥135</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">当日总收入：</span>
+                                <span class="result-value">¥1,485</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">本月累计收入：</span>
+                                <span class="result-value">¥18,785</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 
